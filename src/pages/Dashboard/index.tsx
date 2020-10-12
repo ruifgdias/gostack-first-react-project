@@ -1,57 +1,60 @@
-import React from "react";
-import { FiChevronRight } from 'react-icons/fi'
+import React, { useState, FormEvent } from "react";
+import { FiChevronRight } from "react-icons/fi";
 
 import logo from "../../assets/logo.svg";
 import { Title, Form, Repositories } from "./styles";
 
+import api from "../../services/api";
+
+interface Repository {
+  full_name: string;
+  description: string;
+  owner: {
+    login: string;
+    avatar_url: string;
+  };
+}
+
 const Dashboard: React.FC = () => {
+  const [repos, setRepos] = useState<Repository[]>([]);
+  const [newRepo, setNewRepo] = useState("");
+
+  async function handleAddRepo(ev: FormEvent<HTMLFormElement>): Promise<void> {
+    ev.preventDefault();
+
+    const response = await api.get<Repository>(`repos/${newRepo}`);
+
+    const repo = response.data;
+
+    setRepos([...repos, repo]);
+  }
+
   return (
     <>
       <img src={logo} alt="Github Explorer" />
       <Title>Explore repositories from Github</Title>
-      <Form>
-        <input type="text" placeholder="Nome do repositório" />
+      <Form onSubmit={handleAddRepo}>
+        <input
+          value={newRepo}
+          onChange={(e) => setNewRepo(e.target.value)}
+          type="text"
+          placeholder="Nome do repositório"
+        />
         <button type="submit">Pesquisa</button>
       </Form>
       <Repositories>
-        <a href="#">
-          <img  src="https://avatars1.githubusercontent.com/u/11358427?s=460&u=6d08e390ad75dbe02b1a9df145fb598d616a8a51&v=4" alt="user logo" />
-        
-        <div>
-          <strong>repository/name</strong>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Dicta, porro commodi cumque vero ad impedit. Ex reiciendis ducimus, repellendus tempore ratione illum, aspernatur a ab architecto pariatur quibusdam necessitatibus veniam?
-          </p>
-        </div>
+        {repos.map((rep) => (
+          <a key={rep.full_name} href="#">
+            <img src={rep.owner.avatar_url} alt={rep.owner.login} />
 
-        <FiChevronRight size={20} />
-        </a>
-        
-        <a href="#">
-          <img  src="https://avatars1.githubusercontent.com/u/11358427?s=460&u=6d08e390ad75dbe02b1a9df145fb598d616a8a51&v=4" alt="user logo" />
-        
-        <div>
-          <strong>repository/name</strong>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Dicta, porro commodi cumque vero ad impedit. Ex reiciendis ducimus, repellendus tempore ratione illum, aspernatur a ab architecto pariatur quibusdam necessitatibus veniam?
-          </p>
-        </div>
+            <div>
+              <strong>{rep.full_name}</strong>
+              <p>{rep.description}</p>
+            </div>
 
-        <FiChevronRight size={20} />
-        </a>
-        
-        <a href="#">
-          <img  src="https://avatars1.githubusercontent.com/u/11358427?s=460&u=6d08e390ad75dbe02b1a9df145fb598d616a8a51&v=4" alt="user logo" />
-        
-        <div>
-          <strong>repository/name</strong>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Dicta, porro commodi cumque vero ad impedit. Ex reiciendis ducimus, repellendus tempore ratione illum, aspernatur a ab architecto pariatur quibusdam necessitatibus veniam?
-          </p>
-        </div>
-
-        <FiChevronRight size={20} />
-        </a>
+            <FiChevronRight size={20} />
+          </a>
+        ))}
       </Repositories>
     </>
   );
