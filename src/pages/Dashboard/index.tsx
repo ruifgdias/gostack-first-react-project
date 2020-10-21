@@ -1,5 +1,6 @@
 import React, { useState, useEffect, FormEvent } from "react";
 import { FiChevronRight } from "react-icons/fi";
+import { Link } from 'react-router-dom'
 
 import logo from "../../assets/logo.svg";
 import { Title, Form, Repositories, Error } from "./styles";
@@ -68,7 +69,7 @@ const Dashboard: React.FC = () => {
       { inputError && <Error>{inputError}</Error>}
       <Repositories>
         {repos.map((rep) => (
-          <a key={rep.full_name} href="http://localhost.com">
+          <Link key={rep.full_name} to={`/repository/${rep.full_name}`}>
             <img src={rep.owner.avatar_url} alt={rep.owner.login} />
 
             <div>
@@ -77,7 +78,7 @@ const Dashboard: React.FC = () => {
             </div>
 
             <FiChevronRight size={20} />
-          </a>
+          </Link>
         ))}
       </Repositories>
     </>
